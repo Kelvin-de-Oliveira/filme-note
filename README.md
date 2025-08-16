@@ -11,37 +11,37 @@ Esta é uma API REST em Java com Spring Boot que permite:
 ```mermaid
 classDiagram
     class Usuario {
-        UUID id
-        String nome
-        String email
-        String senhaHash
-        Role role
+        -UUID id
+        -String nome
+        -String email
+        -String senhaHash
+        -Role role
         -List~Resenha~ resenhas
         -List~Curtida~ curtidas
     }
 
     class Filme {
-        UUID id
-        String titulo
-        String diretor
-        Integer anoLancamento
-        String genero
+        -UUID id
+        -String titulo
+        -String diretor
+        -Integer anoLancamento
+        -String genero
         -List~Resenha~ resenhas
     }
 
     class Resenha {
-        UUID id
-        String conteudo
-        Integer nota
-        LocalDateTime criadoEm
+        -UUID id
+        -String conteudo
+        -Integer nota
+        -LocalDateTime criadoEm
         -Usuario autor
         -Filme filme
         -List~Curtida~ curtidas
     }
 
     class Curtida {
-        UUID id
-        LocalDateTime criadaEm
+        -UUID id
+        -LocalDateTime criadaEm
         -Usuario usuario
         -Resenha resenha
     }
