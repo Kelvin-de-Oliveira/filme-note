@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +29,6 @@ public class Review {
     private Film film;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Like likes;
+    private List<Like> likes;
 
 }

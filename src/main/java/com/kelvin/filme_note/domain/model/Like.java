@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "like")
+@Table(name = "tab_like")
 public class Like {
 
     @Id
