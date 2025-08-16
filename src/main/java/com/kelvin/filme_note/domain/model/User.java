@@ -1,10 +1,11 @@
 package com.kelvin.filme_note.domain.model;
 
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.UUID;
-import jakarta.persistence.Id;
 
+@Entity(name = "tab_user")
 public class User {
     @Id
     @GeneratedValue
@@ -14,8 +15,13 @@ public class User {
     private String email;
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "author")
     private List<Review> reviews;
+
+    @OneToMany(mappedBy = "user")
     private List<Like> likes;
 
     public UUID getId() { return id; }
