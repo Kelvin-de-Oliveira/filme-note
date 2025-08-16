@@ -1,0 +1,47 @@
+HELP.md
+# Arquivos de build do Maven
+/target/
+
+# Wrapper do Maven (já incluído no projeto)
+.mvn/wrapper/maven-wrapper.jar
+
+# Pastas de build dentro de módulos, caso existam
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Arquivos de configuração do IntelliJ IDEA
+/.idea/
+/*.iml
+/*.ipr
+/*.iws
+
+# Pastas de configuração do Eclipse/STS (caso alguém abra o projeto lá)
+/.classpath
+/.project
+/.settings/
+/.springBeans
+/.factorypath
+/.apt_generated
+/.sts4-cache
+
+# Arquivos do NetBeans (caso alguém abra o projeto lá)
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Arquivos de configuração do VS Code
+/.vscode/
+
+# Arquivos de logs
+*.log
+
+# Arquivos temporários do sistema
+*.tmp
+*.swp
+.DS_Store
+
+# Dependências externas (não versionar)
+/lib/
+
