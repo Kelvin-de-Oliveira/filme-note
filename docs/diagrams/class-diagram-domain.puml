@@ -1,0 +1,52 @@
+@startuml
+
+' Definição das classes
+class Usuario {
+    -UUID id
+    -String nome
+    -tring email
+    -String senhaHash
+    -Role role
+    +List<Resenha> resenhas
+    +List<Curtida> curtidas
+}
+
+class Filme {
+    -UUID id
+    -String titulo
+    -String diretor
+    -Integer anoLancamento
+    -String genero
+    +List<Resenha> resenhas
+}
+
+class Resenha {
+    -UUID id
+    -String conteudo
+    -Integer nota
+    -LocalDateTime criadoEm
+    +Usuario autor
+    +Filme filme
+    +List<Curtida> curtidas
+}
+
+class Curtida {
+    -UUID id
+    -LocalDateTime criadaEm
+    +Usuario usuario
+    +Resenha resenha
+}
+
+enum Role {
+    USER
+    ADMIN
+}
+
+' Definição das relações
+Usuario "1" -- "0..*" Resenha : escreve
+Usuario "1" -- "0..*" Curtida : usuario
+Filme "1" -- "0..*" Resenha : possui
+Resenha "1" -- "0..*" Curtida : curtida
+Role -- Usuario : perfil
+
+@enduml
