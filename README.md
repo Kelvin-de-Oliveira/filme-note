@@ -16,8 +16,8 @@ classDiagram
         String email
         String senhaHash
         Role role
-        +List~Resenha~ resenhas
-        +List~Curtida~ curtidas
+        -List~Resenha~ resenhas
+        -List~Curtida~ curtidas
     }
 
     class Filme {
@@ -26,7 +26,7 @@ classDiagram
         String diretor
         Integer anoLancamento
         String genero
-        +List~Resenha~ resenhas
+        -List~Resenha~ resenhas
     }
 
     class Resenha {
@@ -34,16 +34,16 @@ classDiagram
         String conteudo
         Integer nota
         LocalDateTime criadoEm
-        +Usuario autor
-        +Filme filme
-        +List~Curtida~ curtidas
+        -Usuario autor
+        -Filme filme
+        -List~Curtida~ curtidas
     }
 
     class Curtida {
         UUID id
         LocalDateTime criadaEm
-        +Usuario usuario
-        +Resenha resenha
+        -Usuario usuario
+        -Resenha resenha
     }
 
     class Role {
