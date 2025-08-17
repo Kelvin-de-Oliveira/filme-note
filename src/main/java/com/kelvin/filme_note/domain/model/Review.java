@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class Review {
     private String description;
     private Integer score;
     private LocalDateTime createdAt;
+    private boolean authorDeleted = false;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = true)
@@ -30,5 +32,74 @@ public class Review {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
+
+    public Review(String description, Integer score, User author, Film film, LocalDateTime createdAt) {
+        this.description = description;
+        this.score = score;
+        this.createdAt = createdAt;
+        this.author = author;
+        this.film = film;
+        this.likes = new ArrayList<Like>();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public Film getFilm() {
+        return film;
+    }
+
+    public void setFilm(Film film) {
+        this.film = film;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public void setAuthorDeleted(boolean authorDeleted) { this.authorDeleted = authorDeleted;}
+    public boolean isAuthorDeleted() { return authorDeleted; }
+
 
 }

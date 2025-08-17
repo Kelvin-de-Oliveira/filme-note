@@ -24,6 +24,13 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Like> likes;
 
+    public User(String name, String email, String passwordHash, Role role) {
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -44,5 +51,7 @@ public class User {
 
     public List<Like> getLikes() { return likes; }
     public void setLikes(List<Like> likes) { this.likes = likes; }
+
+
 
 }

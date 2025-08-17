@@ -23,4 +23,10 @@ public class Like {
     @ManyToOne(optional = false)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
+
+    public Like(User user, Review review, LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        this.user = user;
+        this.review = review;
+    }
 }
