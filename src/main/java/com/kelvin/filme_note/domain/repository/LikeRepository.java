@@ -12,4 +12,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     List<Like> findByUser(User user);
 
     List<Like> findByReview(Review review);
+
+    long countByReview(Review review);
 }
