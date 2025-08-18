@@ -5,12 +5,14 @@ import com.kelvin.filme_note.domain.model.Role;
 import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.repository.FilmRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class FilmService {
 
     private final FilmRepository filmRepository;

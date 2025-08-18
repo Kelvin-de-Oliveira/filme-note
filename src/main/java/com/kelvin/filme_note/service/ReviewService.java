@@ -7,12 +7,15 @@ import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.repository.FilmRepository;
 import com.kelvin.filme_note.domain.repository.LikeRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -68,7 +71,7 @@ public class ReviewService {
     public void deleteReview(User user, UUID reviewId) {
         checkAuthenticated(user);
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("Resenha não encontrada"));
+                .orElseThrow(() -> new NoSuchElementException("Resenha não encontrada"));
         if (!review.getAuthor().equals(user)) {
             throw new SecurityException("Você só pode deletar suas próprias resenhas");
         }
@@ -96,7 +99,7 @@ public class ReviewService {
     public void likeReview(User user, UUID reviewId) {
         checkAuthenticated(user);
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("Resenha não encontrada"));
+                .orElseThrow(() -> new NoSuchElementException("Resenha não encontrada"));
         Like like = new Like(user, review, LocalDateTime.now());
         review.getLikes().add(like);
         likeRepository.save(like);

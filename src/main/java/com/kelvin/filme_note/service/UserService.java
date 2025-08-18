@@ -6,10 +6,14 @@ import com.kelvin.filme_note.domain.model.Review;
 import com.kelvin.filme_note.domain.repository.UserRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
 import com.kelvin.filme_note.service.util.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
 public class UserService {
 
     private final UserRepository userRepository;
@@ -19,6 +23,7 @@ public class UserService {
         this.userRepository = userRepository;
         this.reviewRepository = reviewRepository;
     }
+
 
     // DTO para cadastro de usuário
     public static class RegisterUserRequest {
@@ -34,15 +39,29 @@ public class UserService {
         public String password;
     }
 
-    public User register(RegisterUserRequest dto) {
+    // DTO de resposta para usuário (sem senha)
+    public static class UserResponse {
+        public UUID id;
+        public String name;
+        public String email;
+
+        public UserResponse(User user) {
+            this.id = user.getId();
+            this.name = user.getName();
+            this.email = user.getEmail();
+        }
+    }
+
+    public UserResponse register(RegisterUserRequest dto) {
         if (userRepository.findByEmail(dto.email).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado.");
         }
         User user = new User(dto.name, dto.email, PasswordEncoder.hash(dto.password), Role.USER);
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserResponse(user);
     }
 
-    public void deleteUserProfile(User user) {
+    public UserResponse deleteUserProfile(User user) {
         checkAuthenticated(user);
 
         // Marca resenhas como "autor deletado"
@@ -52,16 +71,23 @@ public class UserService {
             reviewRepository.save(r);
         }
         userRepository.deleteById(user.getId());
+        return new UserResponse(user);
     }
 
-    public User updateUserProfile(UUID userId, UpdateUserRequest dto) {
+    public UserResponse updateUserProfile(UUID userId, UpdateUserRequest dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
         if (dto.name != null) user.setName(dto.name);
         if (dto.email != null) user.setEmail(dto.email);
         if (dto.password != null) user.setPasswordHash(PasswordEncoder.hash(dto.password));
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserResponse(user);
+    }
+
+    public User findById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
     }
 
     private void checkAuthenticated(User user) {
