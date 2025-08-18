@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://yamanote.proxy.rlwy.net:30947/railway
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
