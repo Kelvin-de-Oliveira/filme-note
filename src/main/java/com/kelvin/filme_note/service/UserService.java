@@ -32,14 +32,14 @@ public class UserService {
         public String password;
     }
 
-    // DTO para atualizar dados do usuário (opcional)
+    // DTO para atualizar dados do usuário
     public static class UpdateUserRequest {
         public String name;
         public String email;
         public String password;
     }
 
-    // DTO de resposta para usuário (sem senha)
+    // DTO de resposta para usuário
     public static class UserResponse {
         public UUID id;
         public String name;
