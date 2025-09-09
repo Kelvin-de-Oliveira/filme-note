@@ -5,6 +5,7 @@ import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.model.Review;
 import com.kelvin.filme_note.domain.repository.UserRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
+import com.kelvin.filme_note.dto.user.*;
 import com.kelvin.filme_note.service.util.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,34 +26,8 @@ public class UserService {
     }
 
 
-    // DTO para cadastro de usuário
-    public static class RegisterUserRequest {
-        public String name;
-        public String email;
-        public String password;
-    }
 
-    // DTO para atualizar dados do usuário
-    public static class UpdateUserRequest {
-        public String name;
-        public String email;
-        public String password;
-    }
-
-    // DTO de resposta para usuário
-    public static class UserResponse {
-        public UUID id;
-        public String name;
-        public String email;
-
-        public UserResponse(User user) {
-            this.id = user.getId();
-            this.name = user.getName();
-            this.email = user.getEmail();
-        }
-    }
-
-    public UserResponse register(RegisterUserRequest dto) {
+    public UserResponse register(UserRequest dto) {
         if (userRepository.findByEmail(dto.email).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado.");
         }
@@ -74,7 +49,7 @@ public class UserService {
         return new UserResponse(user);
     }
 
-    public UserResponse updateUserProfile(UUID userId, UpdateUserRequest dto) {
+    public UserResponse updateUserProfile(UUID userId, UserRequest dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
         if (dto.name != null) user.setName(dto.name);

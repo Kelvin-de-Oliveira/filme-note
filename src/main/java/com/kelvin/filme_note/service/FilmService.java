@@ -5,6 +5,7 @@ import com.kelvin.filme_note.domain.model.Role;
 import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.repository.FilmRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
+import com.kelvin.filme_note.dto.film.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
@@ -23,21 +24,6 @@ public class FilmService {
         this.reviewRepository = reviewRepository;
     }
 
-    // DTO para criação de filme
-    public static class CreateFilmRequest {
-        public String title;
-        public String director;
-        public Year releaseYear;
-        public String genre;
-    }
-
-    // DTO para atualização de filme
-    public static class UpdateFilmRequest {
-        public String title;
-        public String director;
-        public Year releaseYear;
-        public String genre;
-    }
 
     public Film registerFilm(User user, CreateFilmRequest dto) {
         checkAdmin(user);

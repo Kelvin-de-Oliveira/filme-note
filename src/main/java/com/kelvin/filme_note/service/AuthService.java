@@ -2,6 +2,8 @@ package com.kelvin.filme_note.service;
 
 import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.repository.UserRepository;
+import com.kelvin.filme_note.dto.auth.LoginRequest;
+import com.kelvin.filme_note.dto.auth.LoginResponse;
 import com.kelvin.filme_note.service.util.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,24 +17,6 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    // DTO para requisição de login
-    public static class LoginRequest {
-        public String emailOrName;
-        public String password;
-    }
-
-    // DTO para resposta de login
-    public static class LoginResponse {
-        public String userId;
-        public String name;
-        public String role;
-
-        public LoginResponse(User user) {
-            this.userId = user.getId().toString();
-            this.name = user.getName();
-            this.role = user.getRole().name();
-        }
-    }
 
     public LoginResponse authenticate(LoginRequest dto) {
         User user;

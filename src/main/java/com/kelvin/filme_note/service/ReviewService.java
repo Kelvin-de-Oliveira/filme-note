@@ -7,6 +7,7 @@ import com.kelvin.filme_note.domain.model.User;
 import com.kelvin.filme_note.domain.repository.FilmRepository;
 import com.kelvin.filme_note.domain.repository.LikeRepository;
 import com.kelvin.filme_note.domain.repository.ReviewRepository;
+import com.kelvin.filme_note.dto.review.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,18 +29,6 @@ public class ReviewService {
         this.filmRepository = filmRepository;
     }
 
-    // DTO para criar resenha
-    public static class CreateReviewRequest {
-        public UUID filmId;
-        public String description;
-        public int score;
-    }
-
-    // DTO para atualizar resenha
-    public static class UpdateReviewRequest {
-        public String description;
-        public Integer score;
-    }
 
     public Review createReview(User user, CreateReviewRequest dto) {
         checkAuthenticated(user);
