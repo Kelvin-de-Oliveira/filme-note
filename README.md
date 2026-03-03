@@ -1,4 +1,4 @@
-# API de Resenhas de Filmes
+# API de Reviews de Movies
 
 Esta é uma API REST em Java com Spring Boot que permite:
 - Usuários se cadastrarem e autenticarem.
@@ -10,40 +10,52 @@ Esta é uma API REST em Java com Spring Boot que permite:
 
 ```mermaid
 classDiagram
-    class Usuario {
+    class User {
         -UUID id
-        -String nome
+        -String name
         -String email
-        -String senhaHash
+        -String passwordHash
         -Role role
-        -List~Resenha~ resenhas
-        -List~Curtida~ curtidas
     }
 
-    class Filme {
+    class Movie {
         -UUID id
-        -String titulo
-        -String diretor
-        -Integer anoLancamento
-        -String genero
-        -List~Resenha~ resenhas
+        -String title
+        -String director
+        -Date releaseYear
+        -String genre
+        -String sinopse
     }
 
-    class Resenha {
+    class Review {
         -UUID id
-        -String conteudo
-        -Integer nota
-        -LocalDateTime criadoEm
-        -Usuario autor
-        -Filme filme
-        -List~Curtida~ curtidas
+        -String description
+        -Integer score
+        -LocalDateTime createAt
+        -User author
+        -Movie movie
     }
-
-    class Curtida {
+    
+    class Comment{
         -UUID id
-        -LocalDateTime criadaEm
-        -Usuario usuario
-        -Resenha resenha
+        -String content
+        -LocalDateTime creaAt
+        -User author
+        -Review review
+    }   
+
+    class ReviewLike {
+        -UUID id
+        -LocalDateTime createAt
+        -User user
+        -Review review
+    }
+    
+    class CommentLike {
+        -UUID id
+        -LocalDateTime createAt
+        -User user
+        -Comment comment
     }
 
     class Role {
@@ -52,11 +64,15 @@ classDiagram
         ADMIN
     }
 
-    Usuario "1" -- "0..*" Resenha : escreve
-    Usuario "1" -- "0..*" Curtida : usuario
-    Filme "1" -- "0..*" Resenha : possui
-    Resenha "1" -- "0..*" Curtida : curtida
-    Role  --  Usuario : perfil
+    User "1" -- "0..*" Review : Write
+    User "1" -- "0..*" ReviewLike : User
+    User "1" -- "0..*" CommentLike: User
+    User "1" -- "0..*" Comment: User
+    Movie "1" -- "0..*" Review : Has
+    Review "1" -- "0..*" ReviewLike : reviewLike
+    Review "1" -- "0..*" Comment: Has 
+    
+    Role  --  User : Role
 ```
 ## Tecnologias
 
