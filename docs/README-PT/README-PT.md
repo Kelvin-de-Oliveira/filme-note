@@ -165,17 +165,57 @@ classDiagram
 
 ## Arquitetura
 
-A aplicação segue uma arquitetura em camadas:
+A aplicação segue a arquitetura **Package by Feature**, onde o código é organizado
+em torno das funcionalidades de negócio e não de camadas técnicas. Cada pacote de
+feature é autocontido, agrupando seu próprio Controller, Service, Repository,
+entidade de domínio e DTOs.
+```
+com.moviereviews
+├── auth/
+├── user/
+├── movie/
+├── review/
+├── comment/
+├── like/
+└── shared/
+    ├── audit/
+    ├── security/
+    └── exception/
+```
 
+### Estrutura interna de cada feature
+
+Cada feature segue o mesmo fluxo interno de camadas:
+```
 Controller → Service → Repository → Database
+```
 
-### Camadas
+| Classe | Responsabilidade |
+|---|---|
+| `Controller` | Expõe os endpoints REST e delega ao Service |
+| `Service` | Contém a lógica de negócio e orquestra as operações do domínio |
+| `Repository` | Gerencia a persistência de dados via Spring Data JPA |
+| `Domain` | Entidade e modelo de domínio da feature |
+| `dto/` | Objetos de entrada e saída — entidades nunca são expostas diretamente |
 
--   **Controller** -- expõe os endpoints REST
--   **Service** -- contém a lógica de negócio
--   **Repository** -- gerencia a persistência de dados usando Spring
-    Data JPA
--   **Domain** -- entidades e modelos de domínio
+### Pacote shared
+
+Responsabilidades transversais que não pertencem a nenhuma feature específica
+ficam em `shared/`:
+
+| Sub-pacote | Responsabilidade |
+|---|---|
+| `shared.audit` | `BaseEntity` com `id`, `createdAt` e `updatedAt` herdados por todas as entidades |
+| `shared.security` | Filtro JWT, `UserPrincipal` e `CustomUserDetailsService` |
+| `shared.exception` | `GlobalExceptionHandler` e hierarquia de exceções de domínio |
+
+### Por que Package by Feature
+
+Organizar por feature em vez de por camada significa que tudo relacionado a um
+conceito de negócio vive em um único lugar. Adicionar ou modificar uma feature
+requer mudanças em um único pacote, reduzindo o risco de efeitos colaterais em
+outras partes do código. Essa abordagem também cria fronteiras naturais para uma
+futura extração em módulos ou serviços independentes.
 
 ------------------------------------------------------------------------
 
