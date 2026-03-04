@@ -1,52 +1,106 @@
 @startuml
+skinparam classAttributeIconSize 0
 
-' Definição das classes
-class Usuario {
-    -UUID id
-    -String nome
-    -tring email
-    -String senhaHash
-    -Role role
-    -List<Resenha> resenhas
-    -List<Curtida> curtidas
+class User {
+  - id : UUID
+  - name : String
+  - email : String
+  - passwordHash : String
+  - role : Role
+  - status : UserStatus
 }
 
-class Filme {
-    -UUID id
-    -String titulo
-    -String diretor
-    -Integer anoLancamento
-    -String genero
-    -List<Resenha> resenhas
+class Movie {
+  - id : UUID
+  - title : String
+  - director : String
+  - releaseYear : Integer
+  - genres : Set<MovieGenre>
+  - synopsis : String
 }
 
-class Resenha {
-    -UUID id
-    -String conteudo
-    -Integer nota
-    -LocalDateTime criadoEm
-    -Usuario autor
-    -Filme filme
-    -List<Curtida> curtidas
+class Review {
+  - id : UUID
+  - content : String
+  - score : BigDecimal
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+  - author : User
+  - movie : Movie
 }
 
-class Curtida {
-    -UUID id
-    -LocalDateTime criadaEm
-    -Usuario usuario
-    -Resenha resenha
+class Comment {
+  - id : UUID
+  - content : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+  - author : User
+  - review : Review
+}
+
+class ReviewLike {
+  - id : UUID
+  - createdAt : LocalDateTime
+  - user : User
+  - review : Review
+}
+
+class CommentLike {
+  - id : UUID
+  - createdAt : LocalDateTime
+  - user : User
+  - comment : Comment
 }
 
 enum Role {
-    USER
-    ADMIN
+  USER
+  ADMIN
 }
 
-' Definição das relações
-Usuario "1" -- "0..*" Resenha : escreve
-Usuario "1" -- "0..*" Curtida : usuario
-Filme "1" -- "0..*" Resenha : possui
-Resenha "1" -- "0..*" Curtida : curtida
-Role -- Usuario : perfil
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+enum MovieGenre {
+  ACTION
+  ADVENTURE
+  ANIMATION
+  BIOGRAPHY
+  COMEDY
+  CRIME
+  DOCUMENTARY
+  DRAMA
+  FAMILY
+  FANTASY
+  HISTORY
+  HORROR
+  MUSIC
+  MUSICAL
+  MYSTERY
+  ROMANCE
+  SCIENCE_FICTION
+  SPORT
+  THRILLER
+  WAR
+  WESTERN
+}
+
+' Relationships
+User "1" -- "0..*" Review : writes
+User "1" -- "0..*" ReviewLike : likes
+User "1" -- "0..*" Comment : writes
+User "1" -- "0..*" CommentLike : likes
+
+Movie "1" -- "0..*" Review : has
+Review "1" -- "0..*" Comment : has
+Review "1" -- "0..*" ReviewLike : likedBy
+Comment "1" -- "0..*" CommentLike : likedBy
+
+note "Constraints:\n- ReviewLike unique(user, review)\n- CommentLike unique(user, comment)\n- Review unique(author, movie)" as N1
+N1 .. ReviewLike
+N1 .. CommentLike
+N1 .. Review
 
 @enduml
