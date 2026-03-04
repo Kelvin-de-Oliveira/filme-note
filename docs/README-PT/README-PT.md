@@ -1,5 +1,7 @@
 # API de Avaliações de Filmes
 
+Português | [English](../../README.md)
+
 Uma API RESTful construída com **Java 21 e Spring Boot** que permite aos
 usuários avaliar filmes, comentar em avaliações e interagir com outros
 usuários por meio de curtidas.
@@ -24,7 +26,7 @@ de dados e arquitetura limpa utilizando o ecossistema Spring.
 
 ## Modelo de Domínio
 
-``` mermaid
+```mermaid
 classDiagram
     class User {
         -UUID id
@@ -76,6 +78,59 @@ classDiagram
         -User user
         -Comment comment
     }
+
+    class Role {
+        <<enumeration>>
+        USER
+        ADMIN
+    }
+    
+    class UserStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+        BANNED
+    }
+    
+    class MovieGenre {
+        <<enumeration>>
+        ACTION
+        ADVENTURE
+        ANIMATION
+        BIOGRAPHY
+        COMEDY
+        CRIME
+        DOCUMENTARY
+        DRAMA
+        FAMILY
+        FANTASY
+        HISTORY
+        HORROR
+        MUSIC
+        MUSICAL
+        MYSTERY
+        ROMANCE
+        SCIENCE_FICTION
+        SPORT
+        THRILLER
+        WAR
+        WESTERN
+    }
+
+    User "1" -- "0..*" Review : Writes
+    User "1" -- "0..*" ReviewLike : Likes
+    User "1" -- "0..*" Comment: Writes
+    User "1" -- "0..*" CommentLike: Creates
+    
+    Movie "1" -- "0..*" Review : Has
+    Review "1" -- "0..*" Comment: Has
+    Review "1" -- "0..*" ReviewLike : LikedBy
+    Comment "1" -- "0..*" CommentLike: LikedBy
+    
+    %% ReviewLike unique(user, review)
+    %% CommentLike unique(user, comment)
+    %% Review unique(author, movie)
+ 
 ```
 
 ------------------------------------------------------------------------
