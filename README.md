@@ -1,6 +1,6 @@
 # Movie Reviews API
 
-English | [Português](ddocs/README-PT/README-PT.md)
+English | [Português](docs/README-PT/README-PT.md)
 
 A RESTful API built with **Java 21 and Spring Boot** that allows users to review movies, comment on reviews, and interact with other users through likes.
 The project was designed to practice backend development concepts such as REST APIs, authentication and authorization, database modeling, and clean architecture using the Spring ecosystem.
