@@ -1,0 +1,72 @@
+@startuml 03 - Package: user
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "user" {
+  class User << @Entity >> {
+    - name: String
+    - email: String
+    - passwordHash: String
+    - role: Role
+    - status: UserStatus
+  }
+
+  class UserController << @RestController >> {
+    - userService: UserService
+    + findAll(pageable: Pageable): ResponseEntity<Page<UserResponse>>
+    + findById(id: UUID): ResponseEntity<UserResponse>
+    + updateStatus(id: UUID, status: UserStatus): ResponseEntity<UserResponse>
+    + delete(id: UUID): ResponseEntity<Void>
+  }
+
+  class UserService {
+    - userRepository: UserRepository
+    + findAll(pageable: Pageable): Page<UserResponse>
+    + findById(id: UUID): UserResponse
+    + updateStatus(id: UUID, status: UserStatus): UserResponse
+    + delete(id: UUID): void
+    + findEntityById(id: UUID): User
+  }
+
+  interface UserRepository << JpaRepository >> {
+    + findByEmail(email: String): Optional<User>
+    + findByStatus(status: UserStatus, pageable: Pageable): Page<User>
+  }
+
+  class UserResponse {
+    + id: UUID
+    + name: String
+    + email: String
+    + role: Role
+    + status: UserStatus
+  }
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+User --> Role
+User --> UserStatus
+UserController --> UserService
+UserService --> UserRepository
+UserService --> UserResponse : maps to
+UserRepository --> User : persists
+
+note bottom of UserService
+  findEntityById() é usado
+  por outros packages para
+  buscar o User sem expor DTO
+end note
+
+@enduml

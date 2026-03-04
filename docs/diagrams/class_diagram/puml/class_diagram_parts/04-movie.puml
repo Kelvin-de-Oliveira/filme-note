@@ -1,0 +1,85 @@
+@startuml 04 - Package: movie
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "movie" {
+  class Movie << @Entity >> {
+    - title: String
+    - director: String
+    - releaseYear: Integer
+    - genres: Set<MovieGenre>
+    - synopsis: String
+  }
+
+  class MovieController << @RestController >> {
+    - movieService: MovieService
+    + findAll(pageable: Pageable): ResponseEntity<Page<MovieResponse>>
+    + findById(id: UUID): ResponseEntity<MovieResponse>
+    + create(request: CreateMovieRequest): ResponseEntity<MovieResponse>
+    + update(id: UUID, request: UpdateMovieRequest): ResponseEntity<MovieResponse>
+    + delete(id: UUID): ResponseEntity<Void>
+  }
+
+  class MovieService {
+    - movieRepository: MovieRepository
+    + findAll(pageable: Pageable): Page<MovieResponse>
+    + findById(id: UUID): MovieResponse
+    + create(request: CreateMovieRequest): MovieResponse
+    + update(id: UUID, request: UpdateMovieRequest): MovieResponse
+    + delete(id: UUID): void
+    + findEntityById(id: UUID): Movie
+  }
+
+  interface MovieRepository << JpaRepository >> {
+    + findByTitleContainingIgnoreCase(title: String, pageable: Pageable): Page<Movie>
+    + findByGenresContaining(genre: MovieGenre, pageable: Pageable): Page<Movie>
+  }
+
+  class CreateMovieRequest {
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+
+  class UpdateMovieRequest {
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+
+  class MovieResponse {
+    + id: UUID
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+}
+
+enum MovieGenre {
+  ACTION
+  ADVENTURE
+  COMEDY
+  DRAMA
+  HORROR
+  ROMANCE
+  SCIENCE_FICTION
+  THRILLER
+  ' ... (21 values total)
+}
+
+Movie --> MovieGenre
+MovieController --> MovieService
+MovieService --> MovieRepository
+MovieService --> MovieResponse : maps to
+MovieRepository --> Movie : persists
+
+@enduml

@@ -1,0 +1,112 @@
+@startuml 00 - Overview (Package Level)
+
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 80
+skinparam ranksep 60
+skinparam padding 5
+
+package "shared" {
+  package "shared.audit" {
+    abstract class BaseEntity
+  }
+  package "shared.security" {
+    class JwtService
+    class UserPrincipal
+    class CustomUserDetailsService
+    class JwtAuthenticationFilter
+  }
+  package "shared.exception" {
+    class GlobalExceptionHandler
+    class BusinessException
+  }
+}
+
+package "auth" {
+  class AuthController
+  class AuthService
+}
+
+package "user" {
+  class User
+  class UserService
+  interface UserRepository
+}
+
+package "movie" {
+  class Movie
+  class MovieService
+  interface MovieRepository
+}
+
+package "review" {
+  class Review
+  class ReviewService
+  interface ReviewRepository
+}
+
+package "comment" {
+  class Comment
+  class CommentService
+  interface CommentRepository
+}
+
+package "like" {
+  class ReviewLike
+  class CommentLike
+  class LikeService
+  interface ReviewLikeRepository
+  interface CommentLikeRepository
+}
+
+' HERANÇA
+BaseEntity <|-- User
+BaseEntity <|-- Movie
+BaseEntity <|-- Review
+BaseEntity <|-- Comment
+BaseEntity <|-- ReviewLike
+BaseEntity <|-- CommentLike
+
+' SECURITY
+UserPrincipal --> User : wraps
+CustomUserDetailsService --> UserRepository : loads
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> CustomUserDetailsService
+
+' AUTH
+AuthController --> AuthService
+AuthService --> UserRepository
+AuthService --> JwtService : generates token
+
+' USER
+UserService --> UserRepository
+
+' MOVIE
+MovieService --> MovieRepository
+
+' REVIEW
+Review --> User : author
+Review --> Movie
+ReviewService --> ReviewRepository
+ReviewService --> UserService : findEntityById
+ReviewService --> MovieService : findEntityById
+
+' COMMENT
+Comment --> User : author
+Comment --> Review
+CommentService --> CommentRepository
+CommentService --> UserService : findEntityById
+CommentService --> ReviewService : findEntityById
+
+' LIKE
+ReviewLike --> User
+ReviewLike --> Review
+CommentLike --> User
+CommentLike --> Comment
+LikeService --> ReviewLikeRepository
+LikeService --> CommentLikeRepository
+LikeService --> UserService : findEntityById
+LikeService --> ReviewService : findEntityById
+LikeService --> CommentService : findEntityById
+
+@enduml

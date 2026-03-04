@@ -1,0 +1,90 @@
+@startuml 01 - Package: shared
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "shared.audit" {
+  abstract class BaseEntity {
+    # id: UUID
+    # createdAt: LocalDateTime
+    # updatedAt: LocalDateTime
+  }
+}
+
+package "shared.security" {
+  interface UserDetails << Spring Security >> {
+    + getAuthorities(): Collection<GrantedAuthority>
+    + getPassword(): String
+    + getUsername(): String
+    + isAccountNonLocked(): boolean
+    + isEnabled(): boolean
+  }
+
+  class UserPrincipal {
+    - user: User
+    + getAuthorities(): Collection<GrantedAuthority>
+    + getPassword(): String
+    + getUsername(): String
+    + isAccountNonLocked(): boolean
+    + isEnabled(): boolean
+    + getUser(): User
+  }
+
+  class JwtService {
+    - secretKey: String
+    - expirationMs: long
+    + generateToken(userDetails: UserDetails): String
+    + extractEmail(token: String): String
+    + isTokenValid(token: String, userDetails: UserDetails): boolean
+  }
+
+  class JwtAuthenticationFilter {
+    - jwtService: JwtService
+    - userDetailsService: CustomUserDetailsService
+    # doFilterInternal(request, response, chain): void
+  }
+
+  class CustomUserDetailsService {
+    - userRepository: UserRepository
+    + loadUserByUsername(email: String): UserDetails
+  }
+}
+
+package "shared.exception" {
+  class GlobalExceptionHandler << @RestControllerAdvice >> {
+    + handleNotFound(ex): ResponseEntity
+    + handleBusiness(ex): ResponseEntity
+    + handleValidation(ex): ResponseEntity
+  }
+
+  class BusinessException {
+    - message: String
+  }
+
+  class EntityNotFoundException {
+  }
+
+  class ReviewAlreadyExistsException {
+  }
+
+  class UserBannedException {
+  }
+
+  class LikeAlreadyExistsException {
+  }
+}
+
+' Relations
+UserPrincipal ..|> UserDetails
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> CustomUserDetailsService
+GlobalExceptionHandler --> BusinessException
+GlobalExceptionHandler --> EntityNotFoundException
+BusinessException <|-- EntityNotFoundException
+BusinessException <|-- ReviewAlreadyExistsException
+BusinessException <|-- UserBannedException
+BusinessException <|-- LikeAlreadyExistsException
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml 02 - Package: auth
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "auth" {
+  class AuthController << @RestController >> {
+    - authService: AuthService
+    + register(request: RegisterRequest): ResponseEntity<AuthResponse>
+    + login(request: LoginRequest): ResponseEntity<AuthResponse>
+  }
+
+  class AuthService {
+    - userRepository: UserRepository
+    - passwordEncoder: PasswordEncoder
+    - jwtService: JwtService
+    + register(request: RegisterRequest): AuthResponse
+    + login(request: LoginRequest): AuthResponse
+  }
+
+  class LoginRequest {
+    + email: String
+    + password: String
+  }
+
+  class RegisterRequest {
+    + name: String
+    + email: String
+    + password: String
+  }
+
+  class AuthResponse {
+    + token: String
+    + userId: UUID
+    + name: String
+  }
+}
+
+' External references (read-only, not detailed here)
+class UserRepository << user package >>
+class JwtService << shared.security >>
+
+AuthController --> AuthService
+AuthService --> LoginRequest : receives
+AuthService --> RegisterRequest : receives
+AuthService --> AuthResponse : returns
+AuthService --> UserRepository : findByEmail / save
+AuthService --> JwtService : generateToken
+
+@enduml

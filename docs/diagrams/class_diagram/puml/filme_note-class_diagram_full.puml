@@ -1,0 +1,508 @@
+@startuml Movie Reviews - Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+' ─────────────────────────────────────────
+' SHARED
+' ─────────────────────────────────────────
+package "shared.audit" {
+  abstract class BaseEntity {
+    # id: UUID
+    # createdAt: LocalDateTime
+    # updatedAt: LocalDateTime
+  }
+}
+
+package "shared.security" {
+  interface UserDetails << Spring Security >> {
+    + getAuthorities(): Collection<GrantedAuthority>
+    + getPassword(): String
+    + getUsername(): String
+    + isAccountNonLocked(): boolean
+    + isEnabled(): boolean
+  }
+
+  class UserPrincipal {
+    - user: User
+    + getAuthorities(): Collection<GrantedAuthority>
+    + getPassword(): String
+    + getUsername(): String
+    + isAccountNonLocked(): boolean
+    + isEnabled(): boolean
+    + getUser(): User
+  }
+
+  class JwtService {
+    - secretKey: String
+    - expirationMs: long
+    + generateToken(userDetails: UserDetails): String
+    + extractEmail(token: String): String
+    + isTokenValid(token: String, userDetails: UserDetails): boolean
+    - extractClaims(token: String): Claims
+  }
+
+  class JwtAuthenticationFilter {
+    - jwtService: JwtService
+    - userDetailsService: CustomUserDetailsService
+    # doFilterInternal(request, response, chain): void
+  }
+
+  class CustomUserDetailsService {
+    - userRepository: UserRepository
+    + loadUserByUsername(email: String): UserDetails
+  }
+}
+
+package "shared.exception" {
+  class GlobalExceptionHandler {
+    + handleNotFound(ex: EntityNotFoundException): ResponseEntity
+    + handleBusiness(ex: BusinessException): ResponseEntity
+    + handleValidation(ex: MethodArgumentNotValidException): ResponseEntity
+  }
+
+  class BusinessException {
+    - message: String
+  }
+
+  class EntityNotFoundException {
+    - message: String
+  }
+
+  class ReviewAlreadyExistsException {
+  }
+
+  class UserBannedException {
+  }
+
+  class LikeAlreadyExistsException {
+  }
+}
+
+' ─────────────────────────────────────────
+' ENUMS
+' ─────────────────────────────────────────
+package "shared.enums" {
+  enum Role {
+    USER
+    ADMIN
+  }
+
+  enum UserStatus {
+    ACTIVE
+    INACTIVE
+    BANNED
+  }
+
+  enum MovieGenre {
+    ACTION
+    ADVENTURE
+    ANIMATION
+    BIOGRAPHY
+    COMEDY
+    CRIME
+    DOCUMENTARY
+    DRAMA
+    FAMILY
+    FANTASY
+    HISTORY
+    HORROR
+    MUSIC
+    MUSICAL
+    MYSTERY
+    ROMANCE
+    SCIENCE_FICTION
+    SPORT
+    THRILLER
+    WAR
+    WESTERN
+  }
+}
+
+' ─────────────────────────────────────────
+' AUTH
+' ─────────────────────────────────────────
+package "auth" {
+  class AuthController {
+    - authService: AuthService
+    + register(request: RegisterRequest): ResponseEntity<AuthResponse>
+    + login(request: LoginRequest): ResponseEntity<AuthResponse>
+  }
+
+  class AuthService {
+    - userRepository: UserRepository
+    - passwordEncoder: PasswordEncoder
+    - jwtService: JwtService
+    + register(request: RegisterRequest): AuthResponse
+    + login(request: LoginRequest): AuthResponse
+  }
+
+  class LoginRequest {
+    + email: String
+    + password: String
+  }
+
+  class RegisterRequest {
+    + name: String
+    + email: String
+    + password: String
+  }
+
+  class AuthResponse {
+    + token: String
+  }
+}
+
+' ─────────────────────────────────────────
+' USER
+' ─────────────────────────────────────────
+package "user" {
+  class User {
+    - name: String
+    - email: String
+    - passwordHash: String
+    - role: Role
+    - status: UserStatus
+  }
+
+  class UserController {
+    - userService: UserService
+    + findAll(pageable: Pageable): ResponseEntity<Page<UserResponse>>
+    + findById(id: UUID): ResponseEntity<UserResponse>
+    + updateStatus(id: UUID, status: UserStatus): ResponseEntity<UserResponse>
+    + delete(id: UUID): ResponseEntity<Void>
+  }
+
+  class UserService {
+    - userRepository: UserRepository
+    + findAll(pageable: Pageable): Page<UserResponse>
+    + findById(id: UUID): UserResponse
+    + updateStatus(id: UUID, status: UserStatus): UserResponse
+    + delete(id: UUID): void
+    + findEntityById(id: UUID): User
+  }
+
+  interface UserRepository {
+    + findByEmail(email: String): Optional<User>
+    + findByStatus(status: UserStatus, pageable: Pageable): Page<User>
+  }
+
+  class UserResponse {
+    + id: UUID
+    + name: String
+    + email: String
+    + role: Role
+    + status: UserStatus
+  }
+}
+
+' ─────────────────────────────────────────
+' MOVIE
+' ─────────────────────────────────────────
+package "movie" {
+  class Movie {
+    - title: String
+    - director: String
+    - releaseYear: Integer
+    - genres: Set<MovieGenre>
+    - synopsis: String
+  }
+
+  class MovieController {
+    - movieService: MovieService
+    + findAll(pageable: Pageable): ResponseEntity<Page<MovieResponse>>
+    + findById(id: UUID): ResponseEntity<MovieResponse>
+    + create(request: CreateMovieRequest): ResponseEntity<MovieResponse>
+    + update(id: UUID, request: UpdateMovieRequest): ResponseEntity<MovieResponse>
+    + delete(id: UUID): ResponseEntity<Void>
+  }
+
+  class MovieService {
+    - movieRepository: MovieRepository
+    + findAll(pageable: Pageable): Page<MovieResponse>
+    + findById(id: UUID): MovieResponse
+    + create(request: CreateMovieRequest): MovieResponse
+    + update(id: UUID, request: UpdateMovieRequest): MovieResponse
+    + delete(id: UUID): void
+    + findEntityById(id: UUID): Movie
+  }
+
+  interface MovieRepository {
+    + findByTitleContainingIgnoreCase(title: String, pageable: Pageable): Page<Movie>
+    + findByGenresContaining(genre: MovieGenre, pageable: Pageable): Page<Movie>
+  }
+
+  class CreateMovieRequest {
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+
+  class UpdateMovieRequest {
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+
+  class MovieResponse {
+    + id: UUID
+    + title: String
+    + director: String
+    + releaseYear: Integer
+    + genres: Set<MovieGenre>
+    + synopsis: String
+  }
+}
+
+' ─────────────────────────────────────────
+' REVIEW
+' ─────────────────────────────────────────
+package "review" {
+  class Review {
+    - content: String
+    - score: BigDecimal
+    - author: User
+    - movie: Movie
+  }
+
+  class ReviewController {
+    - reviewService: ReviewService
+    + findByMovie(movieId: UUID, pageable: Pageable): ResponseEntity<Page<ReviewResponse>>
+    + findByUser(userId: UUID, pageable: Pageable): ResponseEntity<Page<ReviewResponse>>
+    + findById(id: UUID): ResponseEntity<ReviewResponse>
+    + create(request: CreateReviewRequest, principal: UserPrincipal): ResponseEntity<ReviewResponse>
+    + update(id: UUID, request: UpdateReviewRequest, principal: UserPrincipal): ResponseEntity<ReviewResponse>
+    + delete(id: UUID, principal: UserPrincipal): ResponseEntity<Void>
+  }
+
+  class ReviewService {
+    - reviewRepository: ReviewRepository
+    - movieService: MovieService
+    - userService: UserService
+    + findByMovie(movieId: UUID, pageable: Pageable): Page<ReviewResponse>
+    + findByUser(userId: UUID, pageable: Pageable): Page<ReviewResponse>
+    + findById(id: UUID): ReviewResponse
+    + create(request: CreateReviewRequest, author: User): ReviewResponse
+    + update(id: UUID, request: UpdateReviewRequest, author: User): ReviewResponse
+    + delete(id: UUID, author: User): void
+    + isOwner(id: UUID, email: String): boolean
+    + findEntityById(id: UUID): Review
+  }
+
+  interface ReviewRepository {
+    + findByMovieId(movieId: UUID, pageable: Pageable): Page<Review>
+    + findByAuthorId(authorId: UUID, pageable: Pageable): Page<Review>
+    + existsByAuthorIdAndMovieId(authorId: UUID, movieId: UUID): boolean
+  }
+
+  class CreateReviewRequest {
+    + movieId: UUID
+    + content: String
+    + score: BigDecimal
+  }
+
+  class UpdateReviewRequest {
+    + content: String
+    + score: BigDecimal
+  }
+
+  class ReviewResponse {
+    + id: UUID
+    + content: String
+    + score: BigDecimal
+    + authorId: UUID
+    + authorName: String
+    + movieId: UUID
+    + movieTitle: String
+    + createdAt: LocalDateTime
+    + updatedAt: LocalDateTime
+    + likeCount: long
+  }
+}
+
+' ─────────────────────────────────────────
+' COMMENT
+' ─────────────────────────────────────────
+package "comment" {
+  class Comment {
+    - content: String
+    - author: User
+    - review: Review
+  }
+
+  class CommentController {
+    - commentService: CommentService
+    + findByReview(reviewId: UUID, pageable: Pageable): ResponseEntity<Page<CommentResponse>>
+    + create(reviewId: UUID, request: CreateCommentRequest, principal: UserPrincipal): ResponseEntity<CommentResponse>
+    + update(id: UUID, request: UpdateCommentRequest, principal: UserPrincipal): ResponseEntity<CommentResponse>
+    + delete(id: UUID, principal: UserPrincipal): ResponseEntity<Void>
+  }
+
+  class CommentService {
+    - commentRepository: CommentRepository
+    - reviewService: ReviewService
+    - userService: UserService
+    + findByReview(reviewId: UUID, pageable: Pageable): Page<CommentResponse>
+    + create(reviewId: UUID, request: CreateCommentRequest, author: User): CommentResponse
+    + update(id: UUID, request: UpdateCommentRequest, author: User): CommentResponse
+    + delete(id: UUID, author: User): void
+    + isOwner(id: UUID, email: String): boolean
+  }
+
+  interface CommentRepository {
+    + findByReviewId(reviewId: UUID, pageable: Pageable): Page<Comment>
+  }
+
+  class CreateCommentRequest {
+    + content: String
+  }
+
+  class UpdateCommentRequest {
+    + content: String
+  }
+
+  class CommentResponse {
+    + id: UUID
+    + content: String
+    + authorId: UUID
+    + authorName: String
+    + reviewId: UUID
+    + createdAt: LocalDateTime
+    + updatedAt: LocalDateTime
+    + likeCount: long
+  }
+}
+
+' ─────────────────────────────────────────
+' LIKE
+' ─────────────────────────────────────────
+package "like" {
+  class ReviewLike {
+    - user: User
+    - review: Review
+  }
+
+  class CommentLike {
+    - user: User
+    - comment: Comment
+  }
+
+  class LikeController {
+    - likeService: LikeService
+    + likeReview(reviewId: UUID, principal: UserPrincipal): ResponseEntity<Void>
+    + unlikeReview(reviewId: UUID, principal: UserPrincipal): ResponseEntity<Void>
+    + likeComment(commentId: UUID, principal: UserPrincipal): ResponseEntity<Void>
+    + unlikeComment(commentId: UUID, principal: UserPrincipal): ResponseEntity<Void>
+  }
+
+  class LikeService {
+    - reviewLikeRepository: ReviewLikeRepository
+    - commentLikeRepository: CommentLikeRepository
+    - reviewService: ReviewService
+    - commentService: CommentService
+    - userService: UserService
+    + likeReview(reviewId: UUID, user: User): void
+    + unlikeReview(reviewId: UUID, user: User): void
+    + likeComment(commentId: UUID, user: User): void
+    + unlikeComment(commentId: UUID, user: User): void
+  }
+
+  interface ReviewLikeRepository {
+    + existsByUserIdAndReviewId(userId: UUID, reviewId: UUID): boolean
+    + deleteByUserIdAndReviewId(userId: UUID, reviewId: UUID): void
+    + countByReviewId(reviewId: UUID): long
+  }
+
+  interface CommentLikeRepository {
+    + existsByUserIdAndCommentId(userId: UUID, commentId: UUID): boolean
+    + deleteByUserIdAndCommentId(userId: UUID, commentId: UUID): void
+    + countByCommentId(commentId: UUID): long
+  }
+}
+
+' ─────────────────────────────────────────
+' HERANÇA
+' ─────────────────────────────────────────
+BaseEntity <|-- User
+BaseEntity <|-- Movie
+BaseEntity <|-- Review
+BaseEntity <|-- Comment
+BaseEntity <|-- ReviewLike
+BaseEntity <|-- CommentLike
+
+' ─────────────────────────────────────────
+' SECURITY
+' ─────────────────────────────────────────
+UserPrincipal ..|> UserDetails
+UserPrincipal --> User
+CustomUserDetailsService --> UserRepository
+CustomUserDetailsService --> UserPrincipal
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> CustomUserDetailsService
+AuthService --> UserRepository
+AuthService --> JwtService
+
+' ─────────────────────────────────────────
+' DOMÍNIO
+' ─────────────────────────────────────────
+User --> Role
+User --> UserStatus
+Movie --> MovieGenre
+
+Review --> User : author
+Review --> Movie
+
+Comment --> User : author
+Comment --> Review
+
+ReviewLike --> User
+ReviewLike --> Review
+
+CommentLike --> User
+CommentLike --> Comment
+
+' ─────────────────────────────────────────
+' CAMADAS (Controller → Service → Repository)
+' ─────────────────────────────────────────
+AuthController --> AuthService
+
+UserController --> UserService
+UserService --> UserRepository
+
+MovieController --> MovieService
+MovieService --> MovieRepository
+
+ReviewController --> ReviewService
+ReviewService --> ReviewRepository
+ReviewService --> MovieService
+ReviewService --> UserService
+
+CommentController --> CommentService
+CommentService --> CommentRepository
+CommentService --> ReviewService
+CommentService --> UserService
+
+LikeController --> LikeService
+LikeService --> ReviewLikeRepository
+LikeService --> CommentLikeRepository
+LikeService --> ReviewService
+LikeService --> CommentService
+LikeService --> UserService
+
+' ─────────────────────────────────────────
+' EXCEÇÕES
+' ─────────────────────────────────────────
+BusinessException <|-- ReviewAlreadyExistsException
+BusinessException <|-- UserBannedException
+BusinessException <|-- LikeAlreadyExistsException
+BusinessException <|-- EntityNotFoundException
+GlobalExceptionHandler --> BusinessException
+GlobalExceptionHandler --> EntityNotFoundException
+
+@enduml

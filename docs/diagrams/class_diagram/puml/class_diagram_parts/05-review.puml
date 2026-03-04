@@ -1,0 +1,96 @@
+@startuml 05 - Package: review
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "review" {
+  class Review << @Entity >> {
+    - content: String
+    - score: BigDecimal
+    - author: User
+    - movie: Movie
+  }
+
+  class ReviewController << @RestController >> {
+    - reviewService: ReviewService
+    + findByMovie(movieId: UUID, pageable: Pageable): ResponseEntity<Page<ReviewResponse>>
+    + findByUser(userId: UUID, pageable: Pageable): ResponseEntity<Page<ReviewResponse>>
+    + findById(id: UUID): ResponseEntity<ReviewResponse>
+    + create(request: CreateReviewRequest, principal: UserPrincipal): ResponseEntity<ReviewResponse>
+    + update(id: UUID, request: UpdateReviewRequest, principal: UserPrincipal): ResponseEntity<ReviewResponse>
+    + delete(id: UUID, principal: UserPrincipal): ResponseEntity<Void>
+  }
+
+  class ReviewService {
+    - reviewRepository: ReviewRepository
+    - userService: UserService
+    - movieService: MovieService
+    + findByMovie(movieId: UUID, pageable: Pageable): Page<ReviewResponse>
+    + findByUser(userId: UUID, pageable: Pageable): Page<ReviewResponse>
+    + findById(id: UUID): ReviewResponse
+    + create(request: CreateReviewRequest, author: User): ReviewResponse
+    + update(id: UUID, request: UpdateReviewRequest, author: User): ReviewResponse
+    + delete(id: UUID, author: User): void
+    + isOwner(id: UUID, email: String): boolean
+    + findEntityById(id: UUID): Review
+  }
+
+  interface ReviewRepository << JpaRepository >> {
+    + findByMovieId(movieId: UUID, pageable: Pageable): Page<Review>
+    + findByAuthorId(authorId: UUID, pageable: Pageable): Page<Review>
+    + existsByAuthorIdAndMovieId(authorId: UUID, movieId: UUID): boolean
+  }
+
+  class CreateReviewRequest {
+    + movieId: UUID
+    + content: String
+    + score: BigDecimal
+  }
+
+  class UpdateReviewRequest {
+    + content: String
+    + score: BigDecimal
+  }
+
+  class ReviewResponse {
+    + id: UUID
+    + content: String
+    + score: BigDecimal
+    + authorId: UUID
+    + authorName: String
+    + movieId: UUID
+    + movieTitle: String
+    + createdAt: LocalDateTime
+    + updatedAt: LocalDateTime
+    + likeCount: long
+  }
+}
+
+' External references
+class UserService << user package >>
+class MovieService << movie package >>
+class User << user package >>
+class Movie << movie package >>
+
+Review --> User : author
+Review --> Movie
+ReviewController --> ReviewService
+ReviewService --> ReviewRepository
+ReviewService --> UserService : findEntityById
+ReviewService --> MovieService : findEntityById
+ReviewService --> ReviewResponse : maps to
+
+note right of ReviewService
+  isOwner() é chamado pelo
+  @PreAuthorize nos endpoints
+  de update e delete
+end note
+
+note bottom of Review
+  unique constraint:
+  (author_id, movie_id)
+end note
+
+@enduml

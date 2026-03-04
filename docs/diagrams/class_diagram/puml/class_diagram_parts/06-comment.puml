@@ -1,0 +1,73 @@
+@startuml 06 - Package: comment
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+package "comment" {
+  class Comment << @Entity >> {
+    - content: String
+    - author: User
+    - review: Review
+  }
+
+  class CommentController << @RestController >> {
+    - commentService: CommentService
+    + findByReview(reviewId: UUID, pageable: Pageable): ResponseEntity<Page<CommentResponse>>
+    + create(reviewId: UUID, request: CreateCommentRequest, principal: UserPrincipal): ResponseEntity<CommentResponse>
+    + update(id: UUID, request: UpdateCommentRequest, principal: UserPrincipal): ResponseEntity<CommentResponse>
+    + delete(id: UUID, principal: UserPrincipal): ResponseEntity<Void>
+  }
+
+  class CommentService {
+    - commentRepository: CommentRepository
+    - reviewService: ReviewService
+    - userService: UserService
+    + findByReview(reviewId: UUID, pageable: Pageable): Page<CommentResponse>
+    + create(reviewId: UUID, request: CreateCommentRequest, author: User): CommentResponse
+    + update(id: UUID, request: UpdateCommentRequest, author: User): CommentResponse
+    + delete(id: UUID, author: User): void
+    + isOwner(id: UUID, email: String): boolean
+    + findEntityById(id: UUID): Comment
+  }
+
+  interface CommentRepository << JpaRepository >> {
+    + findByReviewId(reviewId: UUID, pageable: Pageable): Page<Comment>
+  }
+
+  class CreateCommentRequest {
+    + content: String
+  }
+
+  class UpdateCommentRequest {
+    + content: String
+  }
+
+  class CommentResponse {
+    + id: UUID
+    + content: String
+    + authorId: UUID
+    + authorName: String
+    + reviewId: UUID
+    + createdAt: LocalDateTime
+    + updatedAt: LocalDateTime
+    + likeCount: long
+  }
+}
+
+' External references
+class UserService << user package >>
+class ReviewService << review package >>
+class User << user package >>
+class Review << review package >>
+
+Comment --> User : author
+Comment --> Review
+CommentController --> CommentService
+CommentService --> CommentRepository
+CommentService --> UserService : findEntityById
+CommentService --> ReviewService : findEntityById
+CommentService --> CommentResponse : maps to
+
+@enduml
