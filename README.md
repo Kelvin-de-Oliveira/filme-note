@@ -153,16 +153,55 @@ classDiagram
 ---
 ## Architecture
 
-The application follows a layered architecture:
+The application follows a **Package by Feature** architecture, where code is organized
+around business features rather than technical layers. Each feature package is
+self-contained, grouping its own Controller, Service, Repository, Domain entity, and DTOs.
+```
+com.moviereviews
+├── auth/
+├── user/
+├── movie/
+├── review/
+├── comment/
+├── like/
+└── shared/
+    ├── audit/
+    ├── security/
+    └── exception/
+```
 
+### Feature Package Structure
+
+Each feature follows the same internal layering:
+```
 Controller → Service → Repository → Database
+```
 
-### Layers
+| Class | Role |
+|---|---|
+| `Controller` | Exposes REST endpoints, delegates to Service |
+| `Service` | Contains business logic, orchestrates domain operations |
+| `Repository` | Handles data persistence via Spring Data JPA |
+| `Domain` | Entity and core domain model for the feature |
+| `dto/` | Request and response objects — never expose entities directly |
 
-- **Controller** – exposes REST endpoints
-- **Service** – contains business logic
-- **Repository** – handles data persistence using Spring Data JPA
-- **Domain** – entities and core domain models
+### Shared Package
+
+Cross-cutting concerns that are not tied to any single feature live in `shared/`:
+
+| Sub-package | Responsibility |
+|---|---|
+| `shared.audit` | `BaseEntity` with `id`, `createdAt`, `updatedAt` inherited by all entities |
+| `shared.security` | JWT filter, `UserPrincipal`, `CustomUserDetailsService` |
+| `shared.exception` | `GlobalExceptionHandler` and domain exception hierarchy |
+
+### Why Package by Feature
+
+Organizing by feature rather than by layer means that everything related to a
+business concept lives in one place. Adding or modifying a feature requires changes
+in a single package, reducing the risk of unintended side effects in other parts of
+the codebase. It also provides a natural boundary for future extraction into
+independent modules or services.
 
 ---
 ## Getting Started
