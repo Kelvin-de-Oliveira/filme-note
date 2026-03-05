@@ -1,4 +1,4 @@
-package com.kelvin.filme_note.shared.enums;
+package com.kelvin.filme_note.movie.enums;
 
 public enum MovieGenres {
         ACTION,

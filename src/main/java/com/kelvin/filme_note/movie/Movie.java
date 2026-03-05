@@ -1,7 +1,7 @@
 package com.kelvin.filme_note.movie;
 
 
-import com.kelvin.filme_note.shared.enums.MovieGenres;
+import com.kelvin.filme_note.movie.enums.MovieGenres;
 import jakarta.persistence.*;
 import lombok.*;
 

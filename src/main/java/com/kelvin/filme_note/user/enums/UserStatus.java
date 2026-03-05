@@ -1,4 +1,4 @@
-package com.kelvin.filme_note.shared.enums;
+package com.kelvin.filme_note.user.enums;
 
 public enum UserStatus {
     ACTIVE,

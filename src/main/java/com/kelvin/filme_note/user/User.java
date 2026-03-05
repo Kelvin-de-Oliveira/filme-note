@@ -1,7 +1,7 @@
 package com.kelvin.filme_note.user;
 
-import com.kelvin.filme_note.shared.enums.Role;
-import com.kelvin.filme_note.shared.enums.UserStatus;
+import com.kelvin.filme_note.auth.enums.Role;
+import com.kelvin.filme_note.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
