@@ -2,6 +2,8 @@
 
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
+skinparam packageBackgroundColor LightYellow
+skinparam packageBorderColor Red
 skinparam nodesep 60
 skinparam ranksep 50
 

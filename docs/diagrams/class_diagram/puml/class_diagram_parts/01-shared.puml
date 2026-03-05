@@ -1,6 +1,8 @@
 @startuml 01 - Package: shared
 
 skinparam classAttributeIconSize 0
+skinparam packageBackgroundColor LightYellow
+skinparam packageBorderColor Red
 skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 50

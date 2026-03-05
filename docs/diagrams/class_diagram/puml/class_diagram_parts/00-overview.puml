@@ -1,6 +1,7 @@
 @startuml 00 - Overview (Package Level)
 
-skinparam packageStyle rectangle
+skinparam packageBackgroundColor LightYellow
+skinparam packageBorderColor Red
 skinparam linetype ortho
 skinparam nodesep 80
 skinparam ranksep 60
