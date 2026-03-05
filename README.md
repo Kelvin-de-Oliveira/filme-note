@@ -27,7 +27,7 @@ classDiagram
         -UUID id
         -String name
         -String email
-        -String passwordHash
+        -String password
         -Role role
         -Userstatus status
     }
