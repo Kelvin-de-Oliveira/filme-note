@@ -1,7 +1,8 @@
-package com.kelvin.filme_note.movie;
+package com.kelvin.filme_note.movie.domain;
 
 
 import com.kelvin.filme_note.movie.enums.MovieGenres;
+import com.kelvin.filme_note.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Movie {
+public class Movie extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

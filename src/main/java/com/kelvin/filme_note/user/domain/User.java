@@ -1,6 +1,7 @@
-package com.kelvin.filme_note.user;
+package com.kelvin.filme_note.user.domain;
 
 import com.kelvin.filme_note.auth.enums.Role;
+import com.kelvin.filme_note.shared.audit.BaseEntity;
 import com.kelvin.filme_note.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

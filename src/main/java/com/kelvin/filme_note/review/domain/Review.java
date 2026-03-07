@@ -1,20 +1,26 @@
-package com.kelvin.filme_note.comment;
+package com.kelvin.filme_note.review.domain;
 
-import com.kelvin.filme_note.user.User;
+import com.kelvin.filme_note.movie.domain.Movie;
+import com.kelvin.filme_note.shared.audit.BaseEntity;
+import com.kelvin.filme_note.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "comments")
+@Table(
+        name = "reviews",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"author_id", "movie_id"})
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comment {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,6 +28,9 @@ public class Comment {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    @Column(nullable = false, precision = 3, scale = 1)
+    private BigDecimal score;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -33,16 +42,8 @@ public class Comment {
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "review_id", nullable = false)
-    private Review review;
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 
-    @PrePersist
-    private void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
-    @PreUpdate
-    private void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

@@ -1,8 +1,7 @@
-package com.kelvin.filme_note.like;
-
-
-import com.kelvin.filme_note.comment.Comment;
-import com.kelvin.filme_note.user.User;
+package com.kelvin.filme_note.like.domain;
+import com.kelvin.filme_note.review.domain.Review;
+import com.kelvin.filme_note.shared.audit.BaseEntity;
+import com.kelvin.filme_note.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,15 +10,15 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "comment_likes",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+        name = "review_likes",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "review_id"})
 )
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommentLike {
+public class ReviewLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,11 +32,7 @@ public class CommentLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review;
 
-    @PrePersist
-    private void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 }
