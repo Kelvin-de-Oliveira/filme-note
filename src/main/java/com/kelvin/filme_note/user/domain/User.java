@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     private String email;
 
     @Column( name = "password_hash", nullable = false)
-    private String passwordHash;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
