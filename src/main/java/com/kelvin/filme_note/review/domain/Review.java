@@ -32,11 +32,6 @@ public class Review extends BaseEntity {
     @Column(nullable = false, precision = 3, scale = 1)
     private BigDecimal score;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
